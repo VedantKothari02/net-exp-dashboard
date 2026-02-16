@@ -1,0 +1,6 @@
+streamlit
+pandas
+playwright
+sqlalchemy
+pytest
+requests
