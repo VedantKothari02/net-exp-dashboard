@@ -51,8 +51,10 @@ class DataCollector:
                         "mem": 0,
                         "switches_total": 0,
                         "switches_up": 0,
+                        "switches_down_list": [],
                         "aps_total": 0,
                         "aps_up": 0,
+                        "aps_down_list": [],
                         "details": f"Error: {exc}"
                     })
 
@@ -79,8 +81,10 @@ class DataCollector:
                 "mem": 0,
                 "switches_total": 0,
                 "switches_up": 0,
+                "switches_down_list": [],
                 "aps_total": 0,
                 "aps_up": 0,
+                "aps_down_list": [],
                 "details": "Device disconnected from FMG"
             }
 
@@ -103,6 +107,7 @@ class DataCollector:
         switch_status = self.client.execute_device_command(name, "/api/v2/monitor/switch-controller/managed-switch/status")
         switches_total = 0
         switches_up = 0
+        switches_down_list = []
 
         if switch_status:
             # Handle potential 'results' wrapper
@@ -118,11 +123,17 @@ class DataCollector:
                     state = str(sw.get('state', '')).lower()
                     if status in ['up', 'online', 'connected'] or state in ['up', 'online', 'connected']:
                         switches_up += 1
+                    else:
+                        # Identify down switch
+                        sw_name = sw.get('name') or sw.get('switch_id') or sw.get('serial') or "Unknown"
+                        switches_down_list.append(sw_name)
 
         # Fetch AP Status
         ap_status = self.client.execute_device_command(name, "/api/v2/monitor/wifi/managed-ap")
         aps_total = 0
         aps_up = 0
+        aps_down_list = []
+
         if ap_status:
              # Handle potential 'results' wrapper
              if isinstance(ap_status, dict) and 'results' in ap_status:
@@ -137,6 +148,10 @@ class DataCollector:
                     # 'running' is also common for APs
                     if status in ['up', 'online', 'connected', 'running'] or conn_state in ['connected', 'online', 'running']:
                         aps_up += 1
+                    else:
+                        # Identify down AP
+                        ap_name = ap.get('name') or ap.get('wtp_id') or ap.get('serial') or "Unknown"
+                        aps_down_list.append(ap_name)
 
         return {
             "name": name,
@@ -146,7 +161,9 @@ class DataCollector:
             "mem": mem,
             "switches_total": switches_total,
             "switches_up": switches_up,
+            "switches_down_list": switches_down_list,
             "aps_total": aps_total,
             "aps_up": aps_up,
+            "aps_down_list": aps_down_list,
             "details": f"Switches: {switches_up}/{switches_total} UP, APs: {aps_up}/{aps_total} UP"
         }

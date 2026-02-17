@@ -97,7 +97,12 @@ if not st.session_state.df.empty:
              st.write(f"CPU: {site_data['cpu']}% | Memory: {site_data['mem']}%")
         with col_d2:
              st.write(f"Switches: {site_data['switches_up']}/{site_data['switches_total']} Online")
+             if 'switches_down_list' in site_data and site_data['switches_down_list']:
+                 st.error(f"Down Switches: {', '.join(site_data['switches_down_list'])}")
+
              st.write(f"APs: {site_data['aps_up']}/{site_data['aps_total']} Online")
+             if 'aps_down_list' in site_data and site_data['aps_down_list']:
+                 st.error(f"Down APs: {', '.join(site_data['aps_down_list'])}")
 
         with st.expander("Raw Data"):
             st.json(site_data.to_dict())
