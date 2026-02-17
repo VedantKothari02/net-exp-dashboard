@@ -6,3 +6,5 @@ verification/
 .DS_Store
 .env
 .venv
+*.log
+.pytest_cache/

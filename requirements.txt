@@ -4,3 +4,7 @@ playwright
 sqlalchemy
 pytest
 requests
+requests==2.31.0
+streamlit==1.32.0
+pandas==2.2.1
+pytest==8.0.2
