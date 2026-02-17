@@ -83,6 +83,21 @@ def main():
 
     st.dataframe(
         filtered_df[['site_id', 'site_name', 'health_status', 'zdx_score', 'wan_status', 'lan_switch_status', 'lan_ap_status']],
+        column_config={
+            "site_id": st.column_config.TextColumn("Site ID", help="Unique identifier for the site"),
+            "site_name": st.column_config.TextColumn("Site Name", help="Name of the branch or location"),
+            "health_status": st.column_config.TextColumn("Health", help="Overall calculated health status"),
+            "zdx_score": st.column_config.ProgressColumn(
+                "Experience Score",
+                help="Network Experience Score (0-100)",
+                format="%d",
+                min_value=0,
+                max_value=100,
+            ),
+            "wan_status": st.column_config.TextColumn("WAN", help="Wide Area Network connection status"),
+            "lan_switch_status": st.column_config.TextColumn("Switch", help="Local Area Network switch status"),
+            "lan_ap_status": st.column_config.TextColumn("Access Point", help="Wireless Access Point status"),
+        },
         use_container_width=True,
         hide_index=True
     )
