@@ -84,9 +84,18 @@ class DataCollector:
                 "details": "Device disconnected from FMG"
             }
 
-        # Fetch System Status
-        sys_status = self.client.execute_device_command(name, "/api/v2/monitor/system/status")
+        # Fetch System, Switch, and AP Status in parallel
+        # Optimization: Fetch these 3 independent resources concurrently to reduce wait time
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            future_sys = executor.submit(self.client.execute_device_command, name, "/api/v2/monitor/system/status")
+            future_sw = executor.submit(self.client.execute_device_command, name, "/api/v2/monitor/switch-controller/managed-switch/status")
+            future_ap = executor.submit(self.client.execute_device_command, name, "/api/v2/monitor/wifi/managed-ap")
 
+            sys_status = future_sys.result()
+            switch_status = future_sw.result()
+            ap_status = future_ap.result()
+
+        # Process System Status
         cpu = 0
         mem = 0
         if sys_status and isinstance(sys_status, dict):
@@ -99,8 +108,7 @@ class DataCollector:
             cpu = stats.get("cpu", 0)
             mem = stats.get("mem", 0)
 
-        # Fetch Switch Status
-        switch_status = self.client.execute_device_command(name, "/api/v2/monitor/switch-controller/managed-switch/status")
+        # Process Switch Status
         switches_total = 0
         switches_up = 0
 
@@ -119,8 +127,7 @@ class DataCollector:
                     if status in ['up', 'online', 'connected'] or state in ['up', 'online', 'connected']:
                         switches_up += 1
 
-        # Fetch AP Status
-        ap_status = self.client.execute_device_command(name, "/api/v2/monitor/wifi/managed-ap")
+        # Process AP Status
         aps_total = 0
         aps_up = 0
         if ap_status:
