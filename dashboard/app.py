@@ -84,7 +84,34 @@ def main():
     st.dataframe(
         filtered_df[['site_id', 'site_name', 'health_status', 'zdx_score', 'wan_status', 'lan_switch_status', 'lan_ap_status']],
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
+        column_config={
+            "site_id": st.column_config.TextColumn("Site ID"),
+            "site_name": st.column_config.TextColumn("Site Name"),
+            "health_status": st.column_config.TextColumn(
+                "Health",
+                help="Overall health status based on ZDX score"
+            ),
+            "zdx_score": st.column_config.ProgressColumn(
+                "Score",
+                help="Network Experience Score (0-100)",
+                format="%.1f",
+                min_value=0,
+                max_value=100,
+            ),
+            "wan_status": st.column_config.TextColumn(
+                "WAN",
+                help="WAN Link Status (UP/DOWN)"
+            ),
+            "lan_switch_status": st.column_config.TextColumn(
+                "Switch",
+                help="LAN Switch Status (UP/DOWN)"
+            ),
+            "lan_ap_status": st.column_config.TextColumn(
+                "AP",
+                help="LAN Access Point Status (UP/DOWN)"
+            ),
+        }
     )
 
     # Detail View
