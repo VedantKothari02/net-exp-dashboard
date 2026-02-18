@@ -1,6 +1,7 @@
 import requests
 import json
 import logging
+from requests.adapters import HTTPAdapter
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +23,11 @@ class FMGClient:
         self.verify_ssl = verify_ssl
         self.session = requests.Session()
         self.session_id = None
+
+        # Increase connection pool size to handle parallel requests
+        adapter = HTTPAdapter(pool_connections=50, pool_maxsize=50)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
 
         if not verify_ssl:
             requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
